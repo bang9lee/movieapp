@@ -1,30 +1,31 @@
-# 🎬 영화 정보 앱 (TMDB Movie App)
-<img src="https://image.tmdb.org/t/p/w500/wwemzKWzjKYJFfCeiB57q3r4Bcm.png" width="120" align="right" />
+# 🎬 오늘의 영화 (TMDB Movie App)
 
-TMDB API를 활용한 **Flutter 기반 영화 정보 앱**입니다.  
-최신 영화, 트레일러, 상세 정보를 세련된 UI와 함께 제공하며, **다크 모드**, **반응형 UI**, **부드러운 애니메이션** 등 사용자 경험에 초점을 맞췄습니다.
 
----
-
+TMDB API를 활용한 **Flutter 기반 영화 정보 앱**입니다.
+</br>
+최신 영화, 트레일러, 상세 정보를 세련된 UI와 함께 제공하며,
+</br>
+**다크 모드**, **반응형 UI**, **부드러운 애니메이션** 등 사용자 경험에 초점을 맞췄습니다.
+</br>
 ## ✨ 주요 기능
-
 ### 🎞️ 영화 카테고리 탐색
 - 현재 상영중
 - 인기 영화 (순위 포함)
 - 평점 높은 영화
 - 개봉 예정작
+</br>
 
 ### 📋 상세 영화 정보
 - 영화 포스터 및 배경 이미지
 - 줄거리, 장르, 러닝타임
 - 평점, 인기도, 예산, 수익
 - 제작사 정보
+</br>
 
 ### ▶️ 트레일러 재생
 - 앱 내 YouTube 플레이어로 재생
 - 트레일러 & 티저 영상 지원
-
----
+</br>
 
 ## 🛠 기술 스택
 
@@ -40,9 +41,7 @@ TMDB API를 활용한 **Flutter 기반 영화 정보 앱**입니다.
 
 ## 📱 스크린샷
 
-| 홈 화면 | 상세 정보 | 트레일러 재생 |
-|---------|-----------|----------------|
-| ![홈](https://via.placeholder.com/250x500?text=홈+화면) | ![상세](https://via.placeholder.com/250x500?text=영화+상세+정보) | ![트레일러](https://via.placeholder.com/250x500?text=트레일러+재생) |
+![iPhone 15 Mockup, Perspective (1)](https://github.com/user-attachments/assets/36d76f03-78c2-4364-b5cf-1594dab95e7b)
 
 ---
 
