@@ -4,10 +4,12 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:movieapp/core/utils/utils.dart';
 import 'package:movieapp/domain/entities/movie_details.dart';
+import 'package:movieapp/domain/entities/video.dart';
 import 'package:movieapp/presentation/providers/movie_provider.dart';
+import 'package:movieapp/presentation/widgets/trailer_player.dart';
 import 'package:shimmer/shimmer.dart';
 
-class MovieDetailScreen extends ConsumerWidget {
+class MovieDetailScreen extends ConsumerStatefulWidget {
   final int movieId;
 
   const MovieDetailScreen({
@@ -16,16 +18,73 @@ class MovieDetailScreen extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final movieDetails = ref.watch(movieDetailsProvider(movieId));
+  ConsumerState<MovieDetailScreen> createState() => _MovieDetailScreenState();
+}
+
+class _MovieDetailScreenState extends ConsumerState<MovieDetailScreen> {
+  Video? _selectedVideo;
+  bool _isPlayingTrailer = false;
+
+  void _playTrailer(Video video) {
+    setState(() {
+      _selectedVideo = video;
+      _isPlayingTrailer = true;
+    });
+  }
+
+  void _closeTrailer() {
+    setState(() {
+      _isPlayingTrailer = false;
+    });
+  }
+
+  // 미사용 메서드 제거됨
+
+  @override
+  Widget build(BuildContext context) {
+    final movieDetails = ref.watch(movieDetailsProvider(widget.movieId));
 
     return Scaffold(
-      body: movieDetails.when(
-        data: (details) => _buildDetails(context, details),
-        loading: () => _buildLoading(),
-        error: (error, stackTrace) => Center(
-          child: Text('영화 정보를 불러오는데 실패했습니다: $error'),
+      // 앱바를 보이게 수정
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              // ignore: deprecated_member_use
+              color: Colors.black.withOpacity(0.5),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Icon(
+              Icons.arrow_back,
+              color: Colors.white,
+            ),
+          ),
+          onPressed: () => Navigator.pop(context),
         ),
+      ),
+      extendBodyBehindAppBar: true, // 콘텐츠가 앱바 뒤로 확장
+      body: Stack(
+        children: [
+          movieDetails.when(
+            data: (details) => _buildDetails(context, details),
+            loading: () => _buildLoading(),
+            error: (error, stackTrace) => Center(
+              child: Text('영화 정보를 불러오는데 실패했습니다: $error'),
+            ),
+          ),
+          
+          // 트레일러 재생 오버레이
+          if (_isPlayingTrailer && _selectedVideo != null)
+            Positioned.fill(
+              child: TrailerPlayer(
+                video: _selectedVideo!,
+                onClose: _closeTrailer,
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -121,6 +180,29 @@ class MovieDetailScreen extends ConsumerWidget {
                   ),
                 ),
               
+              // 트레일러 버튼 - 첫 번째 트레일러가 있는 경우
+              if (details.hasTrailer)
+                Padding(
+                  padding: const EdgeInsets.only(left: 20, right: 20, top: 16),
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      final firstTrailer = details.firstTrailer;
+                      if (firstTrailer != null) {
+                        _playTrailer(firstTrailer);
+                      }
+                    },
+                    icon: const Icon(Icons.play_arrow),
+                    label: const Text('트레일러 보기'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ),
+              
               // 러닝타임
               if (details.runtime != null)
                 Padding(
@@ -192,6 +274,44 @@ class MovieDetailScreen extends ConsumerWidget {
                 ),
               ),
               
+              // 추가 트레일러 및 비디오 섹션
+              if (details.allVideos.isNotEmpty && details.allVideos.length > 1)
+                Padding(
+                  padding: const EdgeInsets.only(left: 20, right: 20, top: 16, bottom: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        '비디오',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        height: 150,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: details.allVideos.length,
+                          itemBuilder: (context, index) {
+                            final video = details.allVideos[index];
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 12),
+                              child: TrailerThumbnail(
+                                video: video,
+                                onTap: () => _playTrailer(video),
+                                width: 200,
+                                height: 150,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              
               // 영화 통계 정보
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20),
@@ -206,8 +326,9 @@ class MovieDetailScreen extends ConsumerWidget {
               
               const SizedBox(height: 8),
               
+              // 오버플로우 수정: 카드 높이 증가 및 스크롤 방식 개선
               SizedBox(
-                height: 100,
+                height: 140, // 높이 더 증가 (기존 120에서 140으로)
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -220,25 +341,29 @@ class MovieDetailScreen extends ConsumerWidget {
                       iconColor: Colors.amber,
                       showRating: true,
                       rating: details.voteAverage / 2, // 10점 만점을 5점 만점으로 변환
+                      minWidth: 120, // 최소 너비 지정
                     ),
                     _buildStatCard(
                       context,
                       title: '평점 투표수',
-                      value: details.voteCount.toString(),
+                      value: _formatNumber(details.voteCount), // 숫자 형식 변경
                       icon: Icons.how_to_vote,
+                      minWidth: 120,
                     ),
                     _buildStatCard(
                       context,
                       title: '인기점수',
-                      value: details.popularity.toStringAsFixed(0),
+                      value: _formatNumber(details.popularity.toInt()), // 숫자 형식 변경
                       icon: Icons.trending_up,
                       iconColor: Colors.green,
+                      minWidth: 120,
                     ),
                     _buildStatCard(
                       context,
                       title: '예산',
                       value: Utils.formatMoney(details.budget),
                       icon: Icons.attach_money,
+                      minWidth: 120,
                     ),
                     _buildStatCard(
                       context,
@@ -246,6 +371,7 @@ class MovieDetailScreen extends ConsumerWidget {
                       value: Utils.formatMoney(details.revenue),
                       icon: Icons.timeline,
                       iconColor: details.revenue > details.budget ? Colors.green : Colors.red,
+                      minWidth: 120,
                     ),
                   ],
                 ),
@@ -325,6 +451,17 @@ class MovieDetailScreen extends ConsumerWidget {
     );
   }
 
+  // 큰 숫자를 읽기 쉬운 형식으로 변환 (예: 15000 -> 15K, 2500000 -> 2.5M)
+  String _formatNumber(int number) {
+    if (number < 1000) {
+      return number.toString();
+    } else if (number < 1000000) {
+      return '${(number / 1000).toStringAsFixed(1)}K';
+    } else {
+      return '${(number / 1000000).toStringAsFixed(1)}M';
+    }
+  }
+
   Widget _buildStatCard(
     BuildContext context, {
     required String title,
@@ -333,9 +470,11 @@ class MovieDetailScreen extends ConsumerWidget {
     Color iconColor = Colors.blue,
     bool showRating = false,
     double rating = 0,
+    double minWidth = 120, // 최소 너비 추가
   }) {
     return Container(
-      width: 120,
+      width: minWidth,
+      constraints: BoxConstraints(minWidth: minWidth),
       margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -354,21 +493,28 @@ class MovieDetailScreen extends ConsumerWidget {
                 size: 18,
               ),
               const SizedBox(width: 4),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[400],
+              Flexible(  // Flexible로 감싸서 오버플로우 방지
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[400],
+                  ),
+                  overflow: TextOverflow.ellipsis,  // 오버플로우시 ...으로 표시
                 ),
               ),
             ],
           ),
           const SizedBox(height: 8),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+          Flexible(  // 여기도 Flexible로 감싸서 오버플로우 방지
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+              overflow: TextOverflow.ellipsis,  // 오버플로우시 ...으로 표시
+              textAlign: TextAlign.center,
             ),
           ),
           if (showRating) ...[
@@ -394,12 +540,11 @@ class MovieDetailScreen extends ConsumerWidget {
   }
   
   SliverAppBar _buildAppBar(BuildContext context, MovieDetails details) {
-    final statusBarHeight = MediaQuery.of(context).padding.top;
-    
     return SliverAppBar(
       expandedHeight: 300.0,
       pinned: true,
       backgroundColor: Theme.of(context).colorScheme.surface,
+      automaticallyImplyLeading: false, // 자동 뒤로가기 버튼 비활성화 (앱바에서 처리)
       flexibleSpace: FlexibleSpaceBar(
         background: Stack(
           fit: StackFit.expand,
@@ -441,22 +586,40 @@ class MovieDetailScreen extends ConsumerWidget {
                 ),
               ),
             ),
+            
+            // 트레일러 재생 버튼 (배경 이미지 위에 있는 버튼)
+            if (details.hasTrailer)
+              Center(
+                child: GestureDetector(
+                  onTap: () {
+                    final firstTrailer = details.firstTrailer;
+                    if (firstTrailer != null) {
+                      _playTrailer(firstTrailer);
+                    }
+                  },
+                  child: Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.play_arrow,
+                      color: Colors.white,
+                      size: 40,
+                    ),
+                  ),
+                ),
+              ),
           ],
-        ),
-      ),
-      leading: Container(
-        margin: EdgeInsets.only(top: statusBarHeight),
-        child: IconButton(
-          icon: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              // ignore: deprecated_member_use
-              color: Colors.black.withOpacity(0.26),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Icon(Icons.arrow_back),
-          ),
-          onPressed: () => Navigator.pop(context),
         ),
       ),
     );

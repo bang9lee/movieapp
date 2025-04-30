@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:movieapp/core/utils/json_utils.dart';
+import 'package:movieapp/core/utils/logger_utils.dart';
 import 'package:movieapp/domain/entities/movie.dart';
 
 part 'movie_model.g.dart';
@@ -56,8 +57,9 @@ class MovieModel {
     try {
       return _$MovieModelFromJson(json);
     } catch (e) {
-      print('Error parsing MovieModel: $e');
-      print('JSON data: $json');
+      Logger.error('Error parsing MovieModel', e);
+      Logger.data('MovieModel JSON', json);
+      
       // 기본값으로 객체 반환
       return MovieModel(
         id: JsonUtils.safeInt(json['id'], 0),

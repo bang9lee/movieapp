@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:movieapp/core/utils/json_utils.dart';
+import 'package:movieapp/core/utils/logger_utils.dart';
 import 'package:movieapp/domain/entities/video.dart';
 
 part 'video_model.g.dart';
@@ -21,7 +22,7 @@ class VideoResultModel {
     try {
       return _$VideoResultModelFromJson(json);
     } catch (e) {
-      print('Error parsing VideoResultModel: $e');
+      Logger.error('Error parsing VideoResultModel', e);
       
       // 기본 비디오 리스트 생성 시도
       List<VideoModel> videosList = [];
@@ -44,7 +45,7 @@ class VideoResultModel {
             )
             .toList();
         } catch (e) {
-          print('Error parsing video results: $e');
+          Logger.error('Error parsing video results', e);
         }
       }
       
@@ -107,7 +108,7 @@ class VideoModel {
     try {
       return _$VideoModelFromJson(json);
     } catch (e) {
-      print('Error parsing VideoModel: $e');
+      Logger.error('Error parsing VideoModel', e);
       // 기본값으로 객체 반환
       return VideoModel(
         id: JsonUtils.safeString(json['id'], ''),

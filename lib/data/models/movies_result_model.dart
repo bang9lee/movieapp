@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:movieapp/core/utils/logger_utils.dart';
 import 'package:movieapp/data/models/movie_model.dart';
 import 'package:movieapp/domain/entities/movies_result.dart';
 
@@ -29,8 +30,9 @@ class MoviesResultModel {
     try {
       return _$MoviesResultModelFromJson(json);
     } catch (e) {
-      print('Error parsing MoviesResultModel: $e');
-      print('JSON data: $json');
+      Logger.error('Error parsing MoviesResultModel', e);
+      Logger.data('JSON data', json);
+      
       // 기본값으로 객체 반환
       return const MoviesResultModel(
         page: 1,

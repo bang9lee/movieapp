@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:movieapp/core/utils/json_utils.dart';
+import 'package:movieapp/core/utils/logger_utils.dart';
 import 'package:movieapp/data/models/video_model.dart';
 import 'package:movieapp/domain/entities/movie_details.dart';
 
@@ -81,8 +82,8 @@ class MovieDetailsModel {
     try {
       return _$MovieDetailsModelFromJson(json);
     } catch (e) {
-      print('Error parsing MovieDetailsModel: $e');
-      print('JSON data: $json');
+      Logger.error('Error parsing MovieDetailsModel', e);
+      Logger.data('MovieDetailsModel JSON', json);
       
       // 기본 비디오 객체
       VideoResultModel? videosModel;
@@ -90,7 +91,7 @@ class MovieDetailsModel {
         try {
           videosModel = VideoResultModel.fromJson(json['videos'] as Map<String, dynamic>);
         } catch (e) {
-          print('Error parsing videos: $e');
+          Logger.error('Error parsing videos', e);
         }
       }
       
@@ -102,7 +103,7 @@ class MovieDetailsModel {
             .map((genreJson) => GenreModel.fromJson(genreJson as Map<String, dynamic>))
             .toList();
         } catch (e) {
-          print('Error parsing genres: $e');
+          Logger.error('Error parsing genres', e);
         }
       }
       
@@ -114,7 +115,7 @@ class MovieDetailsModel {
             .map((companyJson) => ProductionCompanyModel.fromJson(companyJson as Map<String, dynamic>))
             .toList();
         } catch (e) {
-          print('Error parsing production_companies: $e');
+          Logger.error('Error parsing production_companies', e);
         }
       }
       
@@ -181,7 +182,7 @@ class GenreModel {
     try {
       return _$GenreModelFromJson(json);
     } catch (e) {
-      print('Error parsing GenreModel: $e');
+      Logger.error('Error parsing GenreModel', e);
       // 기본값으로 객체 반환
       return GenreModel(
         id: JsonUtils.safeInt(json['id'], 0),
@@ -225,7 +226,7 @@ class ProductionCompanyModel {
     try {
       return _$ProductionCompanyModelFromJson(json);
     } catch (e) {
-      print('Error parsing ProductionCompanyModel: $e');
+      Logger.error('Error parsing ProductionCompanyModel', e);
       // 기본값으로 객체 반환
       return ProductionCompanyModel(
         id: JsonUtils.safeInt(json['id'], 0),

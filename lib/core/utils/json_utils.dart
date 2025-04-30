@@ -1,3 +1,5 @@
+import 'package:movieapp/core/utils/logger_utils.dart';
+
 class JsonUtils {
   /// null-safe 하게 double 값을 가져옵니다
   static double safeDouble(dynamic value, [double defaultValue = 0.0]) {
@@ -51,7 +53,7 @@ class JsonUtils {
       try {
         return value.map((item) => converter(item)).toList();
       } catch (e) {
-        print('Error parsing list: $e');
+        Logger.error('Error parsing list', e);
         return defaultValue;
       }
     }

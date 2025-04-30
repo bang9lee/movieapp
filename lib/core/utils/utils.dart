@@ -45,11 +45,25 @@ class Utils {
     }
   }
 
+  // 개선된 금액 표시 방식
   static String formatMoney(int value) {
     if (value <= 0) {
       return '\$0';
     }
     
+    // 값이 매우 큰 경우 약식 표기 사용
+    if (value >= 1000000000) {
+      // 10억 이상
+      return '\$${(value / 1000000000).toStringAsFixed(1)}B';
+    } else if (value >= 1000000) {
+      // 백만 이상
+      return '\$${(value / 1000000).toStringAsFixed(1)}M';
+    } else if (value >= 1000) {
+      // 천 이상
+      return '\$${(value / 1000).toStringAsFixed(1)}K';
+    }
+    
+    // 일반 표기
     return '\$${NumberFormat('#,###').format(value)}';
   }
 }
