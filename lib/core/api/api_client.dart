@@ -60,4 +60,12 @@ abstract class ApiClient {
     @Query('language') String language = 'ko-KR',
     @Query('append_to_response') String appendToResponse = 'credits,videos,images,reviews,production_companies',
   });
+  
+  // 영화 검색하기 (새로 추가)
+  @GET(ApiConstants.searchMovies)
+  Future<MoviesResultModel> searchMovies({
+    @Query('query') required String query,
+    @Query('page') int page = 1,
+    @Query('language') String language = 'ko-KR',
+  });
 }

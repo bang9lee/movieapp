@@ -18,6 +18,7 @@ class ApiConstants {
   static const String topRatedMovies = "/movie/top_rated";
   static const String upcomingMovies = "/movie/upcoming";
   static const String movieDetails = "/movie/";
+  static const String searchMovies = "/search/movie"; // 검색 엔드포인트 추가
 }
 
 class AppConstants {

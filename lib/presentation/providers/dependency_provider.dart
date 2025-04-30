@@ -40,3 +40,27 @@ final getMovieDetailsUseCaseProvider = Provider<GetMovieDetailsUseCase>((ref) {
   final repository = ref.watch(movieRepositoryProvider);
   return GetMovieDetailsUseCase(repository);
 });
+
+// 영화 검색 유스케이스 Provider
+final searchMoviesUseCaseProvider = Provider<SearchMoviesUseCase>((ref) {
+  final repository = ref.watch(movieRepositoryProvider);
+  return SearchMoviesUseCase(repository);
+});
+
+// 좋아하는 영화 목록 가져오기 유스케이스 Provider
+final getFavoriteMovieIdsUseCaseProvider = Provider<GetFavoriteMovieIdsUseCase>((ref) {
+  final repository = ref.watch(movieRepositoryProvider);
+  return GetFavoriteMovieIdsUseCase(repository);
+});
+
+// 영화 좋아요 토글 유스케이스 Provider
+final toggleFavoriteMovieUseCaseProvider = Provider<ToggleFavoriteMovieUseCase>((ref) {
+  final repository = ref.watch(movieRepositoryProvider);
+  return ToggleFavoriteMovieUseCase(repository);
+});
+
+// 영화가 좋아요인지 확인하는 유스케이스 Provider
+final isMovieFavoriteUseCaseProvider = Provider<IsMovieFavoriteUseCase>((ref) {
+  final repository = ref.watch(movieRepositoryProvider);
+  return IsMovieFavoriteUseCase(repository);
+});

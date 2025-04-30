@@ -16,4 +16,16 @@ abstract class MovieRepository {
   
   /// 영화 상세 정보 가져오기
   Future<MovieDetails> getMovieDetails({required int movieId});
+  
+  /// 영화 검색하기 (새로 추가)
+  Future<MoviesResult> searchMovies({required String query, int page = 1});
+  
+  /// 좋아하는 영화 목록 가져오기 (새로 추가)
+  Future<List<int>> getFavoriteMovieIds();
+  
+  /// 영화를 좋아요에 추가/제거 (새로 추가)
+  Future<bool> toggleFavoriteMovie(int movieId);
+  
+  /// 특정 영화가 좋아요 목록에 있는지 확인 (새로 추가)
+  Future<bool> isMovieFavorite(int movieId);
 }

@@ -6,6 +6,7 @@ import 'package:movieapp/core/utils/utils.dart';
 import 'package:movieapp/domain/entities/movie_details.dart';
 import 'package:movieapp/domain/entities/video.dart';
 import 'package:movieapp/presentation/providers/movie_provider.dart';
+import 'package:movieapp/presentation/widgets/favorite_button.dart';
 import 'package:movieapp/presentation/widgets/trailer_player.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -38,8 +39,6 @@ class _MovieDetailScreenState extends ConsumerState<MovieDetailScreen> {
     });
   }
 
-  // 미사용 메서드 제거됨
-
   @override
   Widget build(BuildContext context) {
     final movieDetails = ref.watch(movieDetailsProvider(widget.movieId));
@@ -58,12 +57,24 @@ class _MovieDetailScreenState extends ConsumerState<MovieDetailScreen> {
               borderRadius: BorderRadius.circular(20),
             ),
             child: const Icon(
-              Icons.arrow_back,
+              Icons.arrow_back_ios_new,
               color: Colors.white,
+              size: 20,
             ),
           ),
           onPressed: () => Navigator.pop(context),
         ),
+        actions: [
+          // 좋아요 버튼 추가
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: FavoriteButton(
+              movieId: widget.movieId,
+              hasBorder: true,
+              size: 24,
+            ),
+          ),
+        ],
       ),
       extendBodyBehindAppBar: true, // 콘텐츠가 앱바 뒤로 확장
       body: Stack(
@@ -72,7 +83,30 @@ class _MovieDetailScreenState extends ConsumerState<MovieDetailScreen> {
             data: (details) => _buildDetails(context, details),
             loading: () => _buildLoading(),
             error: (error, stackTrace) => Center(
-              child: Text('영화 정보를 불러오는데 실패했습니다: $error'),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    size: 70,
+                    color: Colors.red,
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    '영화 정보를 불러오는데 실패했습니다',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '다시 시도해주세요: $error',
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
             ),
           ),
           
@@ -91,8 +125,8 @@ class _MovieDetailScreenState extends ConsumerState<MovieDetailScreen> {
 
   Widget _buildLoading() {
     return Shimmer.fromColors(
-      baseColor: Colors.grey[800]!,
-      highlightColor: Colors.grey[700]!,
+      baseColor: Colors.grey[900]!,
+      highlightColor: Colors.grey[800]!,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -180,28 +214,75 @@ class _MovieDetailScreenState extends ConsumerState<MovieDetailScreen> {
                   ),
                 ),
               
-              // 트레일러 버튼 - 첫 번째 트레일러가 있는 경우
-              if (details.hasTrailer)
-                Padding(
-                  padding: const EdgeInsets.only(left: 20, right: 20, top: 16),
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      final firstTrailer = details.firstTrailer;
-                      if (firstTrailer != null) {
-                        _playTrailer(firstTrailer);
-                      }
-                    },
-                    icon: const Icon(Icons.play_arrow),
-                    label: const Text('트레일러 보기'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+              // 트레일러 버튼 및 찜하기 버튼 (나란히 배치)
+              Padding(
+                padding: const EdgeInsets.only(left: 20, right: 20, top: 16),
+                child: Row(
+                  children: [
+                    if (details.hasTrailer)
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            final firstTrailer = details.firstTrailer;
+                            if (firstTrailer != null) {
+                              _playTrailer(firstTrailer);
+                            }
+                          },
+                          icon: const Icon(Icons.play_arrow),
+                          label: const Text('트레일러 보기'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                      ),
+                    if (details.hasTrailer)
+                      const SizedBox(width: 12),
+                    // 찜하기 버튼
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          // 빌드 사이클 외부에서 상태 업데이트
+                         Future.microtask(() {
+                            ref.read(favoriteMovieIdsProvider.notifier).toggleFavorite(details.id);
+                            // 강제로 isMovieFavoriteProvider를 새로고침하여 UI 업데이트 보장
+                            // ignore: unused_result
+                            ref.refresh(isMovieFavoriteProvider(details.id));
+                          });
+                        },
+                        icon: FavoriteButton(
+                          movieId: details.id,
+                          size: 20,
+                        ),
+                        label: Consumer(
+                          builder: (context, ref, child) {
+                            final isFavorite = ref.watch(isMovieFavoriteProvider(details.id));
+                            return isFavorite.when(
+                              data: (favorite) => Text(favorite ? '찜 완료' : '찜하기'),
+                              loading: () => const Text('찜하기'),
+                              error: (_, __) => const Text('찜하기'),
+                            );
+                          },
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          side: BorderSide(
+                            // ignore: deprecated_member_use
+                            color: Theme.of(context).colorScheme.primary,
+                            width: 1,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
+              ),
               
               // 러닝타임
               if (details.runtime != null)
@@ -619,6 +700,42 @@ class _MovieDetailScreenState extends ConsumerState<MovieDetailScreen> {
                   ),
                 ),
               ),
+            
+            // 영화 포스터와 좋아요 버튼
+            Positioned(
+              right: 20,
+              bottom: 20,
+              child: Container(
+                width: 80,
+                height: 120,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.5),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: CachedNetworkImage(
+                    imageUrl: Utils.getImageUrl(details.posterPath),
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Shimmer.fromColors(
+                      baseColor: Colors.grey[800]!,
+                      highlightColor: Colors.grey[700]!,
+                      child: Container(color: Colors.grey[800]),
+                    ),
+                    errorWidget: (context, url, error) => Container(
+                      color: Colors.grey[900],
+                      child: const Icon(Icons.error_outline, color: Colors.white),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
