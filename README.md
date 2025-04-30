@@ -1,5 +1,6 @@
 # 🎬 영화 정보 앱 (TMDB Movie App)
 <img src="https://image.tmdb.org/t/p/w500/wwemzKWzjKYJFfCeiB57q3r4Bcm.png" width="120" align="left" />
+</br>
 
 ## TMDB API를 활용한 Flutter 기반 영화 정보 앱입니다. 최신 영화, 트레일러, 상세 정보를 세련된 UI와 함께 제공합니다. 
 ## 다크 모드와 반응형 디자인으로 몰입감 있는 영화 탐색 경험을 제공합니다.
