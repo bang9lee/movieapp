@@ -33,6 +33,9 @@ MovieDetailsModel _$MovieDetailsModelFromJson(Map<String, dynamic> json) =>
       videos: json['videos'] == null
           ? null
           : VideoResultModel.fromJson(json['videos'] as Map<String, dynamic>),
+      credits: json['credits'] == null
+          ? null
+          : CreditsModel.fromJson(json['credits'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$MovieDetailsModelToJson(MovieDetailsModel instance) =>
@@ -54,6 +57,56 @@ Map<String, dynamic> _$MovieDetailsModelToJson(MovieDetailsModel instance) =>
       'production_companies':
           instance.productionCompanies.map((e) => e.toJson()).toList(),
       'videos': instance.videos?.toJson(),
+      'credits': instance.credits?.toJson(),
+    };
+
+CreditsModel _$CreditsModelFromJson(Map<String, dynamic> json) => CreditsModel(
+      cast: (json['cast'] as List<dynamic>?)
+              ?.map((e) => CastModel.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      crew: (json['crew'] as List<dynamic>?)
+              ?.map((e) => CrewModel.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+    );
+
+Map<String, dynamic> _$CreditsModelToJson(CreditsModel instance) =>
+    <String, dynamic>{
+      'cast': instance.cast.map((e) => e.toJson()).toList(),
+      'crew': instance.crew.map((e) => e.toJson()).toList(),
+    };
+
+CastModel _$CastModelFromJson(Map<String, dynamic> json) => CastModel(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      name: json['name'] as String? ?? '',
+      profilePath: json['profile_path'] as String?,
+      character: json['character'] as String? ?? '',
+      order: (json['order'] as num?)?.toInt() ?? 0,
+    );
+
+Map<String, dynamic> _$CastModelToJson(CastModel instance) => <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'profile_path': instance.profilePath,
+      'character': instance.character,
+      'order': instance.order,
+    };
+
+CrewModel _$CrewModelFromJson(Map<String, dynamic> json) => CrewModel(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      name: json['name'] as String? ?? '',
+      profilePath: json['profile_path'] as String?,
+      department: json['department'] as String? ?? '',
+      job: json['job'] as String? ?? '',
+    );
+
+Map<String, dynamic> _$CrewModelToJson(CrewModel instance) => <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'profile_path': instance.profilePath,
+      'department': instance.department,
+      'job': instance.job,
     };
 
 GenreModel _$GenreModelFromJson(Map<String, dynamic> json) => GenreModel(

@@ -55,6 +55,9 @@ class MovieDetailsModel {
   
   @JsonKey(name: 'videos')
   final VideoResultModel? videos;
+  
+  @JsonKey(name: 'credits')
+  final CreditsModel? credits;
 
   static double _doubleFromJson(dynamic value) => JsonUtils.safeDouble(value);
   static int _intFromJson(dynamic value) => JsonUtils.safeInt(value);
@@ -76,6 +79,7 @@ class MovieDetailsModel {
     required this.genres,
     required this.productionCompanies,
     this.videos,
+    this.credits,
   });
 
   factory MovieDetailsModel.fromJson(Map<String, dynamic> json) {
@@ -92,6 +96,16 @@ class MovieDetailsModel {
           videosModel = VideoResultModel.fromJson(json['videos'] as Map<String, dynamic>);
         } catch (e) {
           Logger.error('Error parsing videos', e);
+        }
+      }
+      
+      // 기본 크레딧 객체
+      CreditsModel? creditsModel;
+      if (json['credits'] != null) {
+        try {
+          creditsModel = CreditsModel.fromJson(json['credits'] as Map<String, dynamic>);
+        } catch (e) {
+          Logger.error('Error parsing credits', e);
         }
       }
       
@@ -137,6 +151,7 @@ class MovieDetailsModel {
         genres: genresList,
         productionCompanies: companiesList,
         videos: videosModel,
+        credits: creditsModel,
       );
     }
   }
@@ -161,6 +176,178 @@ class MovieDetailsModel {
       genres: genres.map((genre) => genre.toEntity()).toList(),
       productionCompanies: productionCompanies.map((company) => company.toEntity()).toList(),
       videos: videos?.toEntity(),
+      credits: credits?.toEntity(),
+    );
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class CreditsModel {
+  @JsonKey(name: 'cast', defaultValue: <CastModel>[])
+  final List<CastModel> cast;
+  
+  @JsonKey(name: 'crew', defaultValue: <CrewModel>[])
+  final List<CrewModel> crew;
+  
+  const CreditsModel({
+    required this.cast,
+    required this.crew,
+  });
+  
+  factory CreditsModel.fromJson(Map<String, dynamic> json) {
+    try {
+      return _$CreditsModelFromJson(json);
+    } catch (e) {
+      Logger.error('Error parsing CreditsModel', e);
+      
+      // 기본 cast 리스트
+      List<CastModel> castList = [];
+      if (json['cast'] != null && json['cast'] is List) {
+        try {
+          castList = (json['cast'] as List)
+            .map((castJson) => CastModel.fromJson(castJson as Map<String, dynamic>))
+            .toList();
+        } catch (e) {
+          Logger.error('Error parsing cast', e);
+        }
+      }
+      
+      // 기본 crew 리스트
+      List<CrewModel> crewList = [];
+      if (json['crew'] != null && json['crew'] is List) {
+        try {
+          crewList = (json['crew'] as List)
+            .map((crewJson) => CrewModel.fromJson(crewJson as Map<String, dynamic>))
+            .toList();
+        } catch (e) {
+          Logger.error('Error parsing crew', e);
+        }
+      }
+      
+      // 예외 발생 시 기본 값으로 객체 반환
+      return CreditsModel(
+        cast: castList,
+        crew: crewList,
+      );
+    }
+  }
+  
+  Map<String, dynamic> toJson() => _$CreditsModelToJson(this);
+  
+  Credits toEntity() {
+    return Credits(
+      cast: cast.map((model) => model.toEntity()).toList(),
+      crew: crew.map((model) => model.toEntity()).toList(),
+    );
+  }
+}
+
+@JsonSerializable()
+class CastModel {
+  @JsonKey(name: 'id', defaultValue: 0)
+  final int id;
+  
+  @JsonKey(name: 'name', defaultValue: '')
+  final String name;
+  
+  @JsonKey(name: 'profile_path')
+  final String? profilePath;
+  
+  @JsonKey(name: 'character', defaultValue: '')
+  final String character;
+  
+  @JsonKey(name: 'order', defaultValue: 0)
+  final int order;
+  
+  const CastModel({
+    required this.id,
+    required this.name,
+    this.profilePath,
+    required this.character,
+    required this.order,
+  });
+  
+  factory CastModel.fromJson(Map<String, dynamic> json) {
+    try {
+      return _$CastModelFromJson(json);
+    } catch (e) {
+      Logger.error('Error parsing CastModel', e);
+      
+      // 예외 발생 시 기본 값으로 객체 반환
+      return CastModel(
+        id: JsonUtils.safeInt(json['id'], 0),
+        name: JsonUtils.safeString(json['name'], '이름 없음'),
+        profilePath: json['profile_path'] as String?,
+        character: JsonUtils.safeString(json['character'], ''),
+        order: JsonUtils.safeInt(json['order'], 0),
+      );
+    }
+  }
+  
+  Map<String, dynamic> toJson() => _$CastModelToJson(this);
+  
+  Cast toEntity() {
+    return Cast(
+      id: id,
+      name: name,
+      profilePath: profilePath,
+      character: character,
+      order: order,
+    );
+  }
+}
+
+@JsonSerializable()
+class CrewModel {
+  @JsonKey(name: 'id', defaultValue: 0)
+  final int id;
+  
+  @JsonKey(name: 'name', defaultValue: '')
+  final String name;
+  
+  @JsonKey(name: 'profile_path')
+  final String? profilePath;
+  
+  @JsonKey(name: 'department', defaultValue: '')
+  final String department;
+  
+  @JsonKey(name: 'job', defaultValue: '')
+  final String job;
+  
+  const CrewModel({
+    required this.id,
+    required this.name,
+    this.profilePath,
+    required this.department,
+    required this.job,
+  });
+  
+  factory CrewModel.fromJson(Map<String, dynamic> json) {
+    try {
+      return _$CrewModelFromJson(json);
+    } catch (e) {
+      Logger.error('Error parsing CrewModel', e);
+      
+      // 예외 발생 시 기본 값으로 객체 반환
+      return CrewModel(
+        id: JsonUtils.safeInt(json['id'], 0),
+        name: JsonUtils.safeString(json['name'], '이름 없음'),
+        profilePath: json['profile_path'] as String?,
+        department: JsonUtils.safeString(json['department'], ''),
+        job: JsonUtils.safeString(json['job'], ''),
+      );
+    }
+  }
+  
+  Map<String, dynamic> toJson() => _$CrewModelToJson(this);
+  
+  Crew toEntity() {
+    return Crew(
+      id: id,
+      name: name,
+      profilePath: profilePath,
+      department: department,
+      job: job,
     );
   }
 }

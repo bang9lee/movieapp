@@ -16,7 +16,8 @@ class MovieDetails {
   final String? tagline;
   final List<Genre> genres;
   final List<ProductionCompany> productionCompanies;
-  final VideoResult? videos;  // 비디오 정보 추가
+  final VideoResult? videos;
+  final Credits? credits;  // 크레딧 정보 추가
 
   const MovieDetails({
     required this.id,
@@ -34,7 +35,8 @@ class MovieDetails {
     this.tagline,
     required this.genres,
     required this.productionCompanies,
-    this.videos,  // 비디오 정보 추가
+    this.videos,
+    this.credits,
   });
   
   // 트레일러가 있는지 확인하는 메서드
@@ -45,6 +47,54 @@ class MovieDetails {
   
   // 모든 영상 가져오기 (정렬됨)
   List<Video> get allVideos => videos?.allVideos ?? [];
+  
+  // 감독 정보 가져오기
+  List<Crew> get directors => credits?.crew.where((c) => c.job == 'Director').toList() ?? [];
+  
+  // 주요 출연진 (상위 5명)
+  List<Cast> get mainCast => credits?.cast.take(5).toList() ?? [];
+}
+
+class Credits {
+  final List<Cast> cast;
+  final List<Crew> crew;
+  
+  const Credits({
+    required this.cast,
+    required this.crew,
+  });
+}
+
+class Cast {
+  final int id;
+  final String name;
+  final String? profilePath;
+  final String? character;
+  final int order;
+  
+  const Cast({
+    required this.id,
+    required this.name,
+    this.profilePath,
+    this.character,
+    required this.order,
+  });
+}
+
+class Crew {
+  final int id;
+  final String name;
+  final String? profilePath;
+  final String? department;
+  final String? job;
+  
+  const Crew({
+    required this.id,
+    required this.name,
+    this.profilePath,
+    this.department,
+    this.job,
+  });
 }
 
 class Genre {

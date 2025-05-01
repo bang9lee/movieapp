@@ -2,12 +2,16 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:movieapp/core/localization/app_localizations.dart';
 import 'package:movieapp/core/utils/utils.dart';
 import 'package:movieapp/domain/entities/movie_details.dart';
 import 'package:movieapp/domain/entities/video.dart';
 import 'package:movieapp/presentation/providers/movie_provider.dart';
+import 'package:movieapp/presentation/screens/language_screen.dart';
+import 'package:movieapp/presentation/widgets/credits_section.dart';
 import 'package:movieapp/presentation/widgets/favorite_button.dart';
 import 'package:movieapp/presentation/widgets/trailer_player.dart';
+import 'package:movieapp/presentation/widgets/reviews_section.dart';
 import 'package:shimmer/shimmer.dart';
 
 class MovieDetailScreen extends ConsumerStatefulWidget {
@@ -25,6 +29,22 @@ class MovieDetailScreen extends ConsumerStatefulWidget {
 class _MovieDetailScreenState extends ConsumerState<MovieDetailScreen> {
   Video? _selectedVideo;
   bool _isPlayingTrailer = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // 현재 보고 있는 영화 ID 설정 (언어 변경 시 데이터 갱신용)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(currentMovieIdProvider.notifier).state = widget.movieId;
+    });
+  }
+
+  @override
+  void dispose() {
+    // 현재 보고 있는 영화 ID 초기화
+    ref.read(currentMovieIdProvider.notifier).state = null;
+    super.dispose();
+  }
 
   void _playTrailer(Video video) {
     setState(() {
@@ -229,7 +249,7 @@ class _MovieDetailScreenState extends ConsumerState<MovieDetailScreen> {
                             }
                           },
                           icon: const Icon(Icons.play_arrow),
-                          label: const Text('트레일러 보기'),
+                          label: Text('watch_trailer'.tr(context)),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red,
                             foregroundColor: Colors.white,
@@ -261,9 +281,9 @@ class _MovieDetailScreenState extends ConsumerState<MovieDetailScreen> {
                           builder: (context, ref, child) {
                             final isFavorite = ref.watch(isMovieFavoriteProvider(details.id));
                             return isFavorite.when(
-                              data: (favorite) => Text(favorite ? '찜 완료' : '찜하기'),
-                              loading: () => const Text('찜하기'),
-                              error: (_, __) => const Text('찜하기'),
+                              data: (favorite) => Text(favorite ? 'remove_from_favorites'.tr(context) : 'add_to_favorites'.tr(context)),
+                              loading: () => Text('add_to_favorites'.tr(context)),
+                              error: (_, __) => Text('add_to_favorites'.tr(context)),
                             );
                           },
                         ),
@@ -336,16 +356,16 @@ class _MovieDetailScreenState extends ConsumerState<MovieDetailScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      '영화 설명',
-                      style: TextStyle(
+                    Text(
+                      'synopsis'.tr(context),
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      details.overview.isNotEmpty ? details.overview : '영화 설명이 없습니다.',
+                      details.overview.isNotEmpty ? details.overview : 'no_data'.tr(context),
                       style: const TextStyle(
                         fontSize: 16,
                         height: 1.5,
@@ -362,9 +382,9 @@ class _MovieDetailScreenState extends ConsumerState<MovieDetailScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        '비디오',
-                        style: TextStyle(
+                      Text(
+                        'trailer'.tr(context),
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
@@ -394,11 +414,11 @@ class _MovieDetailScreenState extends ConsumerState<MovieDetailScreen> {
                 ),
               
               // 영화 통계 정보
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Text(
-                  '영화 정보',
-                  style: TextStyle(
+                  'movie_info'.tr(context),
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
@@ -416,7 +436,7 @@ class _MovieDetailScreenState extends ConsumerState<MovieDetailScreen> {
                   children: [
                     _buildStatCard(
                       context,
-                      title: '평점',
+                      title: 'rating'.tr(context),
                       value: details.voteAverage.toStringAsFixed(1),
                       icon: Icons.star,
                       iconColor: Colors.amber,
@@ -426,14 +446,14 @@ class _MovieDetailScreenState extends ConsumerState<MovieDetailScreen> {
                     ),
                     _buildStatCard(
                       context,
-                      title: '평점 투표수',
+                      title: 'vote_count'.tr(context),
                       value: _formatNumber(details.voteCount), // 숫자 형식 변경
                       icon: Icons.how_to_vote,
                       minWidth: 120,
                     ),
                     _buildStatCard(
                       context,
-                      title: '인기점수',
+                      title: 'popularity'.tr(context),
                       value: _formatNumber(details.popularity.toInt()), // 숫자 형식 변경
                       icon: Icons.trending_up,
                       iconColor: Colors.green,
@@ -441,14 +461,14 @@ class _MovieDetailScreenState extends ConsumerState<MovieDetailScreen> {
                     ),
                     _buildStatCard(
                       context,
-                      title: '예산',
+                      title: 'budget'.tr(context),
                       value: Utils.formatMoney(details.budget),
                       icon: Icons.attach_money,
                       minWidth: 120,
                     ),
                     _buildStatCard(
                       context,
-                      title: '수익',
+                      title: 'revenue'.tr(context),
                       value: Utils.formatMoney(details.revenue),
                       icon: Icons.timeline,
                       iconColor: details.revenue > details.budget ? Colors.green : Colors.red,
@@ -463,11 +483,11 @@ class _MovieDetailScreenState extends ConsumerState<MovieDetailScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Padding(
-                      padding: EdgeInsets.only(left: 20, right: 20, top: 24, bottom: 8),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20, right: 20, top: 24, bottom: 8),
                       child: Text(
-                        '제작사',
-                        style: TextStyle(
+                        'production_companies'.tr(context),
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
@@ -523,7 +543,14 @@ class _MovieDetailScreenState extends ConsumerState<MovieDetailScreen> {
                     ),
                   ],
                 ),
-              
+                
+              // 출연진 및 제작진 섹션 추가
+              if (details.credits != null)
+                CreditsSection(movie: details),
+                
+              // 리뷰 섹션 추가
+              ReviewsSection(movieId: details.id),
+                
               const SizedBox(height: 40),
             ],
           ),

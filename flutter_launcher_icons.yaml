@@ -1,0 +1,8 @@
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/icon_logo.png"  # 192x192 이미지
+  adaptive_icon_background: "#000000"  # 배경색
+  adaptive_icon_foreground: "assets/images/icon_logo.png"  # 전경 이미지
+  min_sdk_android: 21
+  remove_alpha_ios: true

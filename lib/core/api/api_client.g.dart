@@ -21,7 +21,7 @@ class _ApiClient implements ApiClient {
   @override
   Future<MoviesResultModel> getNowPlayingMovies({
     int page = 1,
-    String language = 'ko-KR',
+    required String language,
   }) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
@@ -54,7 +54,7 @@ class _ApiClient implements ApiClient {
   @override
   Future<MoviesResultModel> getPopularMovies({
     int page = 1,
-    String language = 'ko-KR',
+    required String language,
   }) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
@@ -87,7 +87,7 @@ class _ApiClient implements ApiClient {
   @override
   Future<MoviesResultModel> getTopRatedMovies({
     int page = 1,
-    String language = 'ko-KR',
+    required String language,
   }) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
@@ -120,7 +120,7 @@ class _ApiClient implements ApiClient {
   @override
   Future<MoviesResultModel> getUpcomingMovies({
     int page = 1,
-    String language = 'ko-KR',
+    required String language,
   }) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
@@ -153,7 +153,7 @@ class _ApiClient implements ApiClient {
   @override
   Future<MovieDetailsModel> getMovieDetails({
     required int movieId,
-    String language = 'ko-KR',
+    required String language,
     String appendToResponse =
         'credits,videos,images,reviews,production_companies',
   }) async {
@@ -184,12 +184,12 @@ class _ApiClient implements ApiClient {
     final value = MovieDetailsModel.fromJson(_result.data!);
     return value;
   }
-  
+
   @override
   Future<MoviesResultModel> searchMovies({
     required String query,
     int page = 1,
-    String language = 'ko-KR',
+    required String language,
   }) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
@@ -217,6 +217,167 @@ class _ApiClient implements ApiClient {
               baseUrl,
             ))));
     final value = MoviesResultModel.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
+  Future<PersonModel> getPersonDetails({
+    required int personId,
+    required String language,
+    String appendToResponse = 'combined_credits,images',
+  }) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'language': language,
+      r'append_to_response': appendToResponse,
+    };
+    final _headers = <String, dynamic>{};
+    final Map<String, dynamic>? _data = null;
+    final _result = await _dio
+        .fetch<Map<String, dynamic>>(_setStreamType<PersonModel>(Options(
+      method: 'GET',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              '/person/${personId}',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
+    final value = PersonModel.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
+  Future<ReviewsResultModel> getMovieReviews({
+    required int movieId,
+    int page = 1,
+    required String language,
+  }) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'page': page,
+      r'language': language,
+    };
+    final _headers = <String, dynamic>{};
+    final Map<String, dynamic>? _data = null;
+    final _result = await _dio
+        .fetch<Map<String, dynamic>>(_setStreamType<ReviewsResultModel>(Options(
+      method: 'GET',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              '/movie/${movieId}/reviews',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
+    final value = ReviewsResultModel.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
+  Future<GuestSessionResponseModel> createGuestSession() async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final Map<String, dynamic>? _data = null;
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<GuestSessionResponseModel>(Options(
+      method: 'GET',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              '/authentication/guest_session/new',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
+    final value = GuestSessionResponseModel.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
+  Future<RatingResponseModel> rateMovie({
+    required int movieId,
+    required Map<String, dynamic> rating,
+    required String guestSessionId,
+  }) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'guest_session_id': guestSessionId
+    };
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    _data.addAll(rating);
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<RatingResponseModel>(Options(
+      method: 'POST',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              '/movie/${movieId}/rating',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
+    final value = RatingResponseModel.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
+  Future<RatingResponseModel> deleteRating({
+    required int movieId,
+    required String guestSessionId,
+  }) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'guest_session_id': guestSessionId
+    };
+    final _headers = <String, dynamic>{};
+    final Map<String, dynamic>? _data = null;
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<RatingResponseModel>(Options(
+      method: 'DELETE',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              '/movie/${movieId}/rating',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
+    final value = RatingResponseModel.fromJson(_result.data!);
     return value;
   }
 

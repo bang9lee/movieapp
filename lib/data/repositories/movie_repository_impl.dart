@@ -3,6 +3,8 @@ import 'package:movieapp/core/api/api_client.dart';
 import 'package:movieapp/core/utils/logger_utils.dart';
 import 'package:movieapp/domain/entities/movie_details.dart';
 import 'package:movieapp/domain/entities/movies_result.dart';
+import 'package:movieapp/domain/entities/person.dart';
+import 'package:movieapp/domain/entities/review.dart';
 import 'package:movieapp/domain/repositories/movie_repository.dart';
 
 class MovieRepositoryImpl implements MovieRepository {
@@ -25,39 +27,94 @@ class MovieRepositoryImpl implements MovieRepository {
   }
 
   @override
-  Future<MoviesResult> getNowPlayingMovies({int page = 1}) async {
-    final result = await _apiClient.getNowPlayingMovies(page: page);
+  Future<MoviesResult> getNowPlayingMovies({int page = 1, required String language}) async {
+    final result = await _apiClient.getNowPlayingMovies(page: page, language: language);
     return result.toEntity();
   }
 
   @override
-  Future<MoviesResult> getPopularMovies({int page = 1}) async {
-    final result = await _apiClient.getPopularMovies(page: page);
+  Future<MoviesResult> getPopularMovies({int page = 1, required String language}) async {
+    final result = await _apiClient.getPopularMovies(page: page, language: language);
     return result.toEntity();
   }
 
   @override
-  Future<MoviesResult> getTopRatedMovies({int page = 1}) async {
-    final result = await _apiClient.getTopRatedMovies(page: page);
+  Future<MoviesResult> getTopRatedMovies({int page = 1, required String language}) async {
+    final result = await _apiClient.getTopRatedMovies(page: page, language: language);
     return result.toEntity();
   }
 
   @override
-  Future<MoviesResult> getUpcomingMovies({int page = 1}) async {
-    final result = await _apiClient.getUpcomingMovies(page: page);
+  Future<MoviesResult> getUpcomingMovies({int page = 1, required String language}) async {
+    final result = await _apiClient.getUpcomingMovies(page: page, language: language);
     return result.toEntity();
   }
 
   @override
-  Future<MovieDetails> getMovieDetails({required int movieId}) async {
-    final result = await _apiClient.getMovieDetails(movieId: movieId);
+  Future<MovieDetails> getMovieDetails({required int movieId, required String language}) async {
+    final result = await _apiClient.getMovieDetails(movieId: movieId, language: language);
     return result.toEntity();
   }
   
   @override
-  Future<MoviesResult> searchMovies({required String query, int page = 1}) async {
-    final result = await _apiClient.searchMovies(query: query, page: page);
+  Future<MoviesResult> searchMovies({required String query, int page = 1, required String language}) async {
+    final result = await _apiClient.searchMovies(query: query, page: page, language: language);
     return result.toEntity();
+  }
+  
+  @override
+  Future<Person> getPersonDetails({required int personId, required String language}) async {
+    final result = await _apiClient.getPersonDetails(personId: personId, language: language);
+    return result.toEntity();
+  }
+  
+  @override
+  Future<ReviewsResult> getMovieReviews({required int movieId, int page = 1, required String language}) async {
+    final result = await _apiClient.getMovieReviews(movieId: movieId, page: page, language: language);
+    return result.toEntity();
+  }
+  
+  @override
+  Future<GuestSessionResponse> createGuestSession() async {
+    final result = await _apiClient.createGuestSession();
+    return result.toEntity();
+  }
+  
+  @override
+  Future<bool> rateMovie({
+    required int movieId, 
+    required double rating, 
+    required String guestSessionId
+  }) async {
+    try {
+      final response = await _apiClient.rateMovie(
+        movieId: movieId, 
+        rating: {'value': rating}, 
+        guestSessionId: guestSessionId
+      );
+      Logger.log('평점 등록 응답: ${response.statusMessage}');
+      return response.success;
+    } catch (e) {
+      Logger.error('평점 등록 오류', e);
+      return false;
+    }
+  }
+  
+  @override
+  Future<bool> deleteRating({
+    required int movieId,
+    required String guestSessionId
+  }) async {
+    try {
+      final response = await _apiClient.deleteRating(
+        movieId: movieId,
+        guestSessionId: guestSessionId
+      );
+      return response.success;
+    } catch (e) {
+      Logger.error('평점 삭제 오류', e);
+      return false;
+    }
   }
   
   @override

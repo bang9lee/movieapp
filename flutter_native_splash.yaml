@@ -1,0 +1,23 @@
+
+flutter_native_splash:
+  # 배경색 (검은색)
+  color: "#000000"
+  
+  # 스플래시 이미지 - 고품질 이미지 사용
+  image: "assets/images/icon_logo.png"
+  
+  # 안드로이드 설정
+  android: true
+  
+  # iOS 설정
+  ios: true
+  
+  # 전체화면 모드
+  fullscreen: true
+  
+  # 안드로이드 12 설정
+  android_12:
+    # 안드로이드 12용 이미지
+    image: "assets/images/icon_logo.png"
+    # 아이콘 배경색
+    icon_background_color: "#000000"

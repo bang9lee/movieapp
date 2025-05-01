@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:movieapp/core/localization/app_localizations.dart';
 import 'package:movieapp/domain/entities/movie_details.dart';
 import 'package:movieapp/presentation/providers/dependency_provider.dart';
 import 'package:movieapp/presentation/providers/movie_provider.dart';
-import 'package:movieapp/presentation/screens/main_screen.dart'; // 추가: main_screen.dart 가져오기
+import 'package:movieapp/presentation/screens/main_screen.dart';
 import 'package:movieapp/presentation/screens/movie_detail_screen.dart';
 import 'package:movieapp/presentation/widgets/movie_poster.dart';
 import 'package:shimmer/shimmer.dart';
@@ -12,6 +13,7 @@ import 'package:shimmer/shimmer.dart';
 final favoriteMoviesProvider = FutureProvider.autoDispose<List<MovieDetails>>((ref) async {
   final favoriteIds = ref.watch(favoriteMovieIdsProvider);
   final movieDetailsUseCase = ref.watch(getMovieDetailsUseCaseProvider);
+  final language = ref.watch(localeProvider.notifier).languageTag; // 현재 언어 설정 가져오기
   
   if (favoriteIds.isEmpty) {
     return [];
@@ -20,7 +22,7 @@ final favoriteMoviesProvider = FutureProvider.autoDispose<List<MovieDetails>>((r
   // 각 영화의 상세 정보를 병렬로 가져옴
   final List<Future<MovieDetails>> futures = [];
   for (final id in favoriteIds) {
-    futures.add(movieDetailsUseCase.execute(movieId: id));
+    futures.add(movieDetailsUseCase.execute(movieId: id, language: language));
   }
   
   return await Future.wait(futures);
@@ -35,11 +37,11 @@ class FavoritesScreen extends ConsumerWidget {
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text('내가 찜한 영화'),
+        title: Text('favorites'.tr(context)),
         centerTitle: true,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
-        leading: IconButton( // 뒤로가기 버튼 수정
+        leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new),
           onPressed: () {
             // 탭 인덱스를 홈으로 변경
@@ -50,27 +52,27 @@ class FavoritesScreen extends ConsumerWidget {
       body: favoriteMoviesAsync.when(
         data: (movies) {
           if (movies.isEmpty) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.favorite_border,
                     size: 80,
                     color: Colors.grey,
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Text(
-                    '아직 찜한 영화가 없습니다',
-                    style: TextStyle(
+                    'no_favorites'.tr(context),
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
-                    '영화 상세 페이지에서 하트 아이콘을 눌러 찜하기를 할 수 있습니다',
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                    'favorites_tip'.tr(context),
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
                     textAlign: TextAlign.center,
                     maxLines: 2,
                   ),
@@ -199,16 +201,16 @@ class FavoritesScreen extends ConsumerWidget {
                 color: Colors.red,
               ),
               const SizedBox(height: 16),
-              const Text(
-                '오류가 발생했습니다',
-                style: TextStyle(
+              Text(
+                'error_occurred'.tr(context),
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                '찜한 영화를 불러오는 중 문제가 발생했습니다: $error',
+                'favorites_error'.tr(context).replaceFirst('{error}', error.toString()),
                 style: const TextStyle(fontSize: 14, color: Colors.grey),
                 textAlign: TextAlign.center,
               ),

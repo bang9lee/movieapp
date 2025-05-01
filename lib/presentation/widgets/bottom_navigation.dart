@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:movieapp/core/localization/app_localizations.dart';
 
 class BottomNavigation extends StatelessWidget {
   final int currentIndex;
@@ -46,39 +47,50 @@ class BottomNavigation extends StatelessWidget {
             fontSize: 11,
           ),
           elevation: 0, // 그림자 제거
-          items: const [
+          items: [
             BottomNavigationBarItem(
-              icon: Padding(
+              icon: const Padding(
                 padding: EdgeInsets.only(bottom: 4, top: 4), 
                 child: Icon(Icons.home_rounded),
               ),
-              activeIcon: Padding(
+              activeIcon: const Padding(
                 padding: EdgeInsets.only(bottom: 4, top: 4),
                 child: Icon(Icons.home_filled),
               ),
-              label: '홈',
+              label: 'home'.tr(context),
             ),
             BottomNavigationBarItem(
-              icon: Padding(
+              icon: const Padding(
                 padding: EdgeInsets.only(bottom: 4, top: 4),
                 child: Icon(Icons.search),
               ),
-              activeIcon: Padding(
+              activeIcon: const Padding(
                 padding: EdgeInsets.only(bottom: 4, top: 4),
                 child: Icon(Icons.search),
               ),
-              label: '검색',
+              label: 'search'.tr(context),
             ),
             BottomNavigationBarItem(
-              icon: Padding(
+              icon: const Padding(
                 padding: EdgeInsets.only(bottom: 4, top: 4),
                 child: Icon(Icons.favorite_border_rounded),
               ),
-              activeIcon: Padding(
+              activeIcon: const Padding(
                 padding: EdgeInsets.only(bottom: 4, top: 4),
                 child: Icon(Icons.favorite_rounded),
               ),
-              label: '찜한 영화',
+              label: 'favorites'.tr(context),
+            ),
+            BottomNavigationBarItem(
+              icon: const Padding(
+                padding: EdgeInsets.only(bottom: 4, top: 4),
+                child: Icon(Icons.settings_outlined),
+              ),
+              activeIcon: const Padding(
+                padding: EdgeInsets.only(bottom: 4, top: 4),
+                child: Icon(Icons.settings),
+              ),
+              label: 'settings'.tr(context),
             ),
           ],
         ),

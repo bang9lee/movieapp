@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:movieapp/presentation/screens/favorites_screen.dart';
 import 'package:movieapp/presentation/screens/home_screen.dart';
 import 'package:movieapp/presentation/screens/search_screen.dart';
+import 'package:movieapp/presentation/screens/settings_screen.dart';
 import 'package:movieapp/presentation/widgets/bottom_navigation.dart';
 
 // 현재 선택된 네비게이션 인덱스 관리 provider
@@ -21,6 +22,7 @@ class _MainScreenState extends ConsumerState<MainScreen> with SingleTickerProvid
     GlobalKey(),
     GlobalKey(),
     GlobalKey(),
+    GlobalKey(), // 설정 탭을 위한 키 추가
   ];
   
   // 탭 컨트롤러 사용
@@ -29,7 +31,7 @@ class _MainScreenState extends ConsumerState<MainScreen> with SingleTickerProvid
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this); // 길이를 4로 변경
     
     // 탭 컨트롤러와 Provider 상태 동기화
     _tabController.addListener(_handleTabChange);
@@ -79,6 +81,10 @@ class _MainScreenState extends ConsumerState<MainScreen> with SingleTickerProvid
           KeyedSubtree(
             key: _tabKeys[2],
             child: const FavoritesScreen(),
+          ),
+          KeyedSubtree(
+            key: _tabKeys[3],
+            child: const SettingsScreen(), // 설정 화면 추가
           ),
         ],
       ),

@@ -1,0 +1,44 @@
+{
+    "app_title": "今日の映画",
+    "home": "ホーム",
+    "search": "検索",
+    "favorites": "お気に入り",
+    "now_playing": "上映中",
+    "popular": "人気順",
+    "top_rated": "評価順",
+    "upcoming": "公開予定",
+    "most_popular": "最も人気",
+    
+    "search_hint": "映画タイトルを入力",
+    "search_placeholder": "映画を検索",
+    "search_desc": "タイトルで検索して様々な映画を見つけましょう",
+    "no_results": "検索結果がありません",
+    "try_different": "別のキーワードで試してください",
+    "search_results_for": "の検索結果",
+    
+    "no_favorites": "お気に入りの映画はまだありません",
+    "favorites_desc": "映画詳細ページでハートアイコンをタップして、お気に入りに追加できます",
+    "add_favorite": "お気に入りに追加",
+    "remove_favorite": "お気に入りに追加済み",
+    
+    "movie_overview": "概要",
+    "no_overview": "概要はありません。",
+    "videos": "動画",
+    "movie_info": "映画情報",
+    "studios": "制作会社",
+    "trailer": "予告編を見る",
+    
+    "rating": "評価",
+    "vote_count": "投票数",
+    "popularity": "人気度",
+    "budget": "予算",
+    "revenue": "興行収入",
+    
+    "error_title": "エラーが発生しました",
+    "error_message": "もう一度お試しください",
+    "load_error": "映画の読み込みに失敗しました。",
+    
+    "language": "言語",
+    "language_settings": "言語設定",
+    "select_language": "言語を選択"
+  }

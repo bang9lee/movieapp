@@ -47,6 +47,36 @@ final searchMoviesUseCaseProvider = Provider<SearchMoviesUseCase>((ref) {
   return SearchMoviesUseCase(repository);
 });
 
+// 인물 상세 정보 유스케이스 Provider
+final getPersonDetailsUseCaseProvider = Provider<GetPersonDetailsUseCase>((ref) {
+  final repository = ref.watch(movieRepositoryProvider);
+  return GetPersonDetailsUseCase(repository);
+});
+
+// 영화 리뷰 유스케이스 Provider
+final getMovieReviewsUseCaseProvider = Provider<GetMovieReviewsUseCase>((ref) {
+  final repository = ref.watch(movieRepositoryProvider);
+  return GetMovieReviewsUseCase(repository);
+});
+
+// 게스트 세션 생성 유스케이스 Provider
+final createGuestSessionUseCaseProvider = Provider<CreateGuestSessionUseCase>((ref) {
+  final repository = ref.watch(movieRepositoryProvider);
+  return CreateGuestSessionUseCase(repository);
+});
+
+// 영화 평점 등록 유스케이스 Provider
+final rateMovieUseCaseProvider = Provider<RateMovieUseCase>((ref) {
+  final repository = ref.watch(movieRepositoryProvider);
+  return RateMovieUseCase(repository);
+});
+
+// 영화 평점 삭제 유스케이스 Provider (추가)
+final deleteRatingUseCaseProvider = Provider<DeleteRatingUseCase>((ref) {
+  final repository = ref.watch(movieRepositoryProvider);
+  return DeleteRatingUseCase(repository);
+});
+
 // 좋아하는 영화 목록 가져오기 유스케이스 Provider
 final getFavoriteMovieIdsUseCaseProvider = Provider<GetFavoriteMovieIdsUseCase>((ref) {
   final repository = ref.watch(movieRepositoryProvider);

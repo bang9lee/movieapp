@@ -1,6 +1,7 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_carousel_slider/carousel_slider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:movieapp/core/utils/utils.dart';
 import 'package:movieapp/domain/entities/movie.dart';
 import 'package:movieapp/presentation/providers/movie_provider.dart';
@@ -8,11 +9,18 @@ import 'package:movieapp/presentation/screens/movie_detail_screen.dart';
 import 'package:movieapp/presentation/widgets/horizontal_movie_list.dart';
 import 'package:shimmer/shimmer.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  final CarouselSliderController _carouselController = CarouselSliderController();
+
+  @override
+  Widget build(BuildContext context) {
     final nowPlayingMovies = ref.watch(nowPlayingMoviesProvider);
     final popularMovies = ref.watch(popularMoviesProvider);
     final topRatedMovies = ref.watch(topRatedMoviesProvider);
@@ -20,19 +28,10 @@ class HomeScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.movie_outlined, size: 20),
-            SizedBox(width: 8),
-            Text(
-              '오늘의 영화',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
+        title: Image.asset(
+          'assets/images/app_logo.png',
+          height: 92,
+          fit: BoxFit.contain,
         ),
         centerTitle: true,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -53,8 +52,8 @@ class HomeScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 가장 인기있는 영화 (헤더)
-              _buildFeaturedMovie(ref, context),
+              // 가장 인기있는 영화 (캐러셀 슬라이더로 변경)
+              _buildFeaturedMovieCarousel(ref, context),
               
               // 현재 상영중인 영화
               nowPlayingMovies.when(
@@ -129,25 +128,52 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildFeaturedMovie(WidgetRef ref, BuildContext context) {
-    final nowPlayingMovies = ref.watch(nowPlayingMoviesProvider);
+  Widget _buildFeaturedMovieCarousel(WidgetRef ref, BuildContext context) {
+    final popularMovies = ref.watch(popularMoviesProvider);
     
-    return nowPlayingMovies.when(
+    return popularMovies.when(
       data: (movies) {
         if (movies.isEmpty) {
           return const SizedBox.shrink();
         }
         
-        // 첫 번째 영화를 메인 영화로 사용
-        final featuredMovie = movies.first;
-        return _buildFeaturedMovieCard(context, featuredMovie);
+        // 상위 5개 영화만 캐러셀에 표시
+        final carouselMovies = movies.take(5).toList();
+        
+        return Column(
+          children: [
+            const SizedBox(height: 16),
+            // 캐러셀 슬라이더
+            SizedBox(
+              height: 250,
+              child: CarouselSlider(
+                controller: _carouselController,
+                slideTransform: const CubeTransform(),
+                slideIndicator: CircularSlideIndicator(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  currentIndicatorColor: Theme.of(context).colorScheme.primary,
+                  indicatorBackgroundColor: Colors.grey.shade600,
+                ),
+                unlimitedMode: true,
+                enableAutoSlider: true,
+                autoSliderDelay: const Duration(seconds: 5),
+                autoSliderTransitionTime: const Duration(milliseconds: 800),
+                onSlideChanged: (index) {
+                  // 여기서 상태 업데이트를 제거하였습니다
+                },
+                children: carouselMovies.map((movie) => _buildCarouselItem(context, movie)).toList(),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+        );
       },
-      loading: () => _buildFeaturedMovieLoading(),
+      loading: () => _buildCarouselLoading(),
       error: (_, __) => const SizedBox.shrink(),
     );
   }
 
-  Widget _buildFeaturedMovieCard(BuildContext context, Movie movie) {
+  Widget _buildCarouselItem(BuildContext context, Movie movie) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -158,18 +184,27 @@ class HomeScreen extends ConsumerWidget {
         );
       },
       child: Container(
-        width: MediaQuery.of(context).size.width,
-        height: 250,
-        margin: const EdgeInsets.all(20),
+        margin: const EdgeInsets.symmetric(horizontal: 5.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              spreadRadius: 1,
+              blurRadius: 5,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
         child: Stack(
           children: [
             // 영화 이미지
             ClipRRect(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(16),
               child: CachedNetworkImage(
                 imageUrl: Utils.getImageUrl(movie.backdropPath ?? movie.posterPath, size: ImageSize.original),
-                width: MediaQuery.of(context).size.width - 40,
-                height: 250,
+                width: double.infinity,
+                height: double.infinity,
                 fit: BoxFit.cover,
                 placeholder: (context, url) => Shimmer.fromColors(
                   baseColor: Colors.grey[800]!,
@@ -188,14 +223,12 @@ class HomeScreen extends ConsumerWidget {
             // 그라데이션 레이어
             Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(16),
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
                     Colors.transparent,
-                    // withOpacity를 사용하되 lint 경고 무시
-                    // ignore: deprecated_member_use
                     Colors.black.withOpacity(0.8),
                   ],
                 ),
@@ -255,8 +288,6 @@ class HomeScreen extends ConsumerWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  // withOpacity를 사용하되 lint 경고 무시
-                  // ignore: deprecated_member_use
                   color: Theme.of(context).colorScheme.primary.withOpacity(0.8),
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -276,20 +307,24 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildFeaturedMovieLoading() {
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: Shimmer.fromColors(
-        baseColor: Colors.grey[800]!,
-        highlightColor: Colors.grey[700]!,
-        child: Container(
-          height: 250,
-          decoration: BoxDecoration(
-            color: Colors.grey[800],
-            borderRadius: BorderRadius.circular(12),
+  Widget _buildCarouselLoading() {
+    return Column(
+      children: [
+        const SizedBox(height: 16),
+        Shimmer.fromColors(
+          baseColor: Colors.grey[800]!,
+          highlightColor: Colors.grey[700]!,
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            height: 250,
+            decoration: BoxDecoration(
+              color: Colors.grey[800],
+              borderRadius: BorderRadius.circular(16),
+            ),
           ),
         ),
-      ),
+        const SizedBox(height: 28),
+      ],
     );
   }
 }

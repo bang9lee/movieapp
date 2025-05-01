@@ -1,0 +1,44 @@
+{
+    "app_title": "今日电影",
+    "home": "首页",
+    "search": "搜索",
+    "favorites": "收藏",
+    "now_playing": "正在上映",
+    "popular": "最受欢迎",
+    "top_rated": "评分最高",
+    "upcoming": "即将上映",
+    "most_popular": "最热门",
+    
+    "search_hint": "输入电影标题",
+    "search_placeholder": "搜索电影",
+    "search_desc": "通过电影标题搜索各种电影",
+    "no_results": "没有搜索结果",
+    "try_different": "尝试不同的搜索词",
+    "search_results_for": "的搜索结果",
+    
+    "no_favorites": "还没有收藏的电影",
+    "favorites_desc": "可以在电影详情页点击心形图标收藏电影",
+    "add_favorite": "添加到收藏",
+    "remove_favorite": "已收藏",
+    
+    "movie_overview": "简介",
+    "no_overview": "没有简介。",
+    "videos": "视频",
+    "movie_info": "电影信息",
+    "studios": "制作公司",
+    "trailer": "观看预告片",
+    
+    "rating": "评分",
+    "vote_count": "评分人数",
+    "popularity": "热度",
+    "budget": "预算",
+    "revenue": "票房",
+    
+    "error_title": "发生错误",
+    "error_message": "请重试",
+    "load_error": "加载电影失败。",
+    
+    "language": "语言",
+    "language_settings": "语言设置",
+    "select_language": "选择语言"
+  }

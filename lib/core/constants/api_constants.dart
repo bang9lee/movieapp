@@ -18,7 +18,13 @@ class ApiConstants {
   static const String topRatedMovies = "/movie/top_rated";
   static const String upcomingMovies = "/movie/upcoming";
   static const String movieDetails = "/movie/";
-  static const String searchMovies = "/search/movie"; // 검색 엔드포인트 추가
+  static const String searchMovies = "/search/movie";
+  static const String personDetails = "/person/"; 
+  static const String createGuestSession = "/authentication/guest_session/new";
+  
+  // 새로 추가된 엔드포인트
+  static const String rateMovie = "/movie/{movie_id}/rating";
+  static const String deleteRating = "/movie/{movie_id}/rating";
 }
 
 class AppConstants {

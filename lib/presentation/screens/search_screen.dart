@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:movieapp/core/localization/app_localizations.dart';
 import 'package:movieapp/presentation/providers/movie_provider.dart';
 import 'package:movieapp/presentation/screens/movie_detail_screen.dart';
 import 'package:movieapp/presentation/widgets/movie_poster.dart';
@@ -75,7 +76,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             controller: _searchController,
             focusNode: _searchFocusNode,
             decoration: InputDecoration(
-              hintText: '영화 제목을 입력하세요',
+              hintText: 'search_hint'.tr(context),
               hintStyle: TextStyle(color: Colors.grey[500], fontSize: 14),
               prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
               suffixIcon: _searchController.text.isNotEmpty
@@ -102,28 +103,28 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         data: (movies) {
           // 빌드 메서드 안에서 상태를 직접 업데이트하지 않고 표시 로직만 처리
           if (searchState == SearchState.initial) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.search,
                     size: 70,
                     color: Colors.grey,
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Text(
-                    '영화를 검색해보세요',
-                    style: TextStyle(
+                    'search_movies'.tr(context),
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                       color: Colors.white,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
-                    '영화 제목으로 검색하시면 다양한 영화를 찾을 수 있습니다',
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                    'search_description'.tr(context),
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -150,7 +151,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    '"${ref.read(searchQueryProvider)}"에 대한 검색 결과가 없습니다',
+                    'no_results_for'.tr(context).replaceFirst('{query}', ref.read(searchQueryProvider)),
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -159,9 +160,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    '다른 검색어로 시도해보세요',
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                  Text(
+                    'try_another_search'.tr(context),
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -190,7 +191,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    '"${ref.read(searchQueryProvider)}"에 대한 검색 결과가 없습니다',
+                    'no_results_for'.tr(context).replaceFirst('{query}', ref.read(searchQueryProvider)),
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -199,9 +200,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    '다른 검색어로 시도해보세요',
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                  Text(
+                    'try_another_search'.tr(context),
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -254,28 +255,28 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         },
         loading: () {
           if (searchState == SearchState.initial) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.search,
                     size: 70,
                     color: Colors.grey,
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Text(
-                    '영화를 검색해보세요',
-                    style: TextStyle(
+                    'search_movies'.tr(context),
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                       color: Colors.white,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
-                    '영화 제목으로 검색하시면 다양한 영화를 찾을 수 있습니다',
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                    'search_description'.tr(context),
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -324,9 +325,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   color: Colors.red,
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  '오류가 발생했습니다',
-                  style: TextStyle(
+                Text(
+                  'error_occurred'.tr(context),
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                     color: Colors.white,
@@ -334,7 +335,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '검색 중 문제가 발생했습니다: $error',
+                  'error_during_search'.tr(context).replaceFirst('{error}', error.toString()),
                   style: const TextStyle(fontSize: 14, color: Colors.grey),
                   textAlign: TextAlign.center,
                 ),
