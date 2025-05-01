@@ -46,7 +46,8 @@ TMDB API를 활용한 **Flutter 기반 영화 정보 앱**입니다.
 
 ## 📱 스크린샷
 
-![iPhone 15 Mockup, Perspective (1)](https://github.com/user-attachments/assets/36d76f03-78c2-4364-b5cf-1594dab95e7b)
+![iPhone 15 Mockup, Perspective](https://github.com/user-attachments/assets/1c5678c5-3c5b-4340-bc68-bdc8a3958987)
+
 
 ---
 
